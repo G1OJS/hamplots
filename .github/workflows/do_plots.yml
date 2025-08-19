@@ -1,11 +1,14 @@
 
 name: do_plots
 on:
-  schedule:
-      - cron: '*/5 * * * *'
+#  schedule:
+#      - cron: '*/5 * * * *'
   workflow_dispatch:    
   workflow_call:
-    
+  workflow_run:
+      workflows: ['run-listener-tx']
+      types: [completed]
+   
 jobs:
   plot:
     runs-on: ubuntu-latest

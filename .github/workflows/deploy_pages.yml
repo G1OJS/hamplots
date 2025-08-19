@@ -2,15 +2,16 @@
 name: Deploy to pages 
 
 on:
-  schedule:
-      - cron: '*/5 * * * *'
-
-  push:
-    paths:
-      - '**.png'
-      
+#  schedule:
+#      - cron: '*/5 * * * *'
+#  push:
+#    paths:
+#      - '**.png'     
   workflow_dispatch:
   workflow_call:
+  workflow_run:
+      workflows: ['do_plots']
+      types: [completed]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:

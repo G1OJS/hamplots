@@ -1,0 +1,39 @@
+
+name: do_plots
+on:
+  schedule:
+      - cron: '*/5 * * * *'
+  workflow_dispatch:    
+  workflow_call:
+    
+jobs:
+  plot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: set identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install matplotlib, pandas
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install matplotlib --upgrade 
+          python -m pip install pandas --upgrade 
+
+        run: python3 plots.py
+
+      - name: stage changed files
+        run: git add -f .
+      - name: commit plots/*.png
+        run: git commit plots/*.png -m "commit plots"
+      - name: clean up untracked files
+        run: git clean -f
+      - name: pull & rebase
+        run: git pull --rebase 
+      - name: push
+        run: git push 

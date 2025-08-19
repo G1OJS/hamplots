@@ -33,13 +33,15 @@ def sub_listen_dump(self, client, userdata, flags, reason_code, properties):
     mqtt_cl.loop_stop()
     mqtt_cl.disconnect()
 
-    with open("Decodes.csv", 'a') as f:
-        for d in decodes:
-            ebfm = f"{d['t']}, {d['b']}, {d['f']}, {d['md']}, "
-            spot = f"{d['hc']}, {d['hl']}, {d['ha']}, {d['TxRx']}, {d['oc']}, {d['ol']}, {d['oa']}, {d['rp']}\n"
-            f.write(ebfm+spot)
-            f.flush()
-        self.decodes = []
+    frx = open("Rx_decodes.csv","a")
+    ftx = open("Tx_decodes.csv","a")
+    for d in decodes:
+        ebfm = f"{d['t']}, {d['b']}, {d['f']}, {d['md']}, "
+        spot = f"{d['hc']}, {d['hl']}, {d['ha']}, {d['TxRx']}, {d['oc']}, {d['ol']}, {d['oa']}, {d['rp']}\n"
+        f = ftx if d['TxRx'] == "Tx" else frx
+        f.write(ebfm+spot)
+        f.flush()
+    decodes = []
 
 def add_decode(self, client, userdata, msg):
     d = ast.literal_eval(msg.payload.decode())
@@ -53,7 +55,7 @@ def add_decode(self, client, userdata, msg):
     d.update({'oc':  d['sc'] if TxRx =="Rx" else d['rc']})
     d.update({'ol':  d['sl'] if TxRx =="Rx" else d['rl']})
     d.update({'oa':  d['sa'] if TxRx =="Rx" else d['ra']})
-    self.decodes.append(d)
+    decodes.append(d)
 
 get_cfg()
 mqtt_cl = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id = f"subscribe-{self.TxRx}")

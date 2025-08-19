@@ -22,4 +22,4 @@ jobs:
           python-version: '3.11'
           
       - name: start_rx
-        run: python3 ./scripts/listener-15m.py
+        run: python3 listener-15m.py

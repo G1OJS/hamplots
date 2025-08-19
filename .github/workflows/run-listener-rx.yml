@@ -26,7 +26,7 @@ jobs:
           python -m pip install paho-mqtt
 
       - name: start_rx
-        run: python3 listener-rx.py
+        run: python3 listener.py
 
       - name: stage changed files
         run: git add -f .

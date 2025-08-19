@@ -141,7 +141,7 @@ def do_plots(timewin_start_offset_secs):
                 remote_calls = cover_home_calls(remote_calls, homecall_reports)
 
                 # plot setup
-                timestr = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+                timestr = datetime.datetime.now().strftime("%d/%m/%Y %H:%M UTC")
                 fig, axs = plt.subplots()
                 remote_action = "Transmitting" if RxTx == "Rx" else "Receiving"
                 home_entities = "Receivers'" if RxTx == "Rx" else "Transmitters'"

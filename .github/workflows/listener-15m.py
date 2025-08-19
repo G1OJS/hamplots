@@ -3,7 +3,6 @@ import ast
 import datetime
 import time
 
-
 global myBands, myModes, mySquares
 
 def get_cfg():
@@ -28,6 +27,7 @@ class pskr_listener:
         self.mqtt_cl.on_connect = self.subscribe
         self.mqtt_cl.on_message = self.add_decode
         self.mqtt_cl.connect("mqtt.pskreporter.info", 1883, 60)
+      
 
     def loop_and_dump(self, time_seconds):
         self.mqtt_cl.loop_start()
@@ -35,7 +35,7 @@ class pskr_listener:
         self.mqtt_cl.loop_stop()
         self.mqtt_cl.disconnect()
 
-        with open(self.to_file, 'a') as f:
+        with open("Rx_decodes.csv", 'a') as f:
             for d in self.decodes:
                 ebfm = f"{d['t']}, {d['b']}, {d['f']}, {d['md']}, "
                 spot = f"{d['hc']}, {d['hl']}, {d['ha']}, {d['TxRx']}, {d['oc']}, {d['ol']}, {d['oa']}, {d['rp']}\n"
@@ -52,8 +52,6 @@ class pskr_listener:
                     print(f"Subscribe to {self.TxRx} in {sq} on {b} {md}")
                     tailstr = f"+/+/{sq}/+/+/#" if self.TxRx == "Tx" else f"+/+/+/{sq}/+/#"
                     client.subscribe(f"pskr/filter/v2/{b}/{md}/{tailstr}")
-        while(True):
-            self.loop_and_dump(15*60)
 
     def add_decode(self, client, userdata, msg):
         d = ast.literal_eval(msg.payload.decode())
@@ -66,10 +64,12 @@ class pskr_listener:
         d.update({'oc':  d['sc'] if self.TxRx =="Rx" else d['rc']})
         d.update({'ol':  d['sl'] if self.TxRx =="Rx" else d['rl']})
         d.update({'oa':  d['sa'] if self.TxRx =="Rx" else d['ra']})
-        self.decodes.append[d]
+        self.decodes.append(d)
 
-
+get_cfg()
 rx = pskr_listener("Rx")
+while(True):
+    rx.loop_and_dump(15*60)
 
 
 

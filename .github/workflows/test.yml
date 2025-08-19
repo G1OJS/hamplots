@@ -27,3 +27,14 @@ jobs:
 
       - name: start_rx
         run: python3 listener-15m.py
+
+      - name: stage changed files
+        run: git add -f .
+      - name: commit *.csv
+        run: git commit *.csv 
+      - name: clean up untracked files
+        run: git clean -f
+      - name: pull & rebase
+        run: git pull --rebase 
+      - name: push
+        run: git push 

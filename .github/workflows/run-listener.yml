@@ -9,7 +9,7 @@ on:
   workflow_call:
     
 jobs:
-  collect_rx:
+  collect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install paho-mqtt
 
-      - name: start_rx
+      - name: start listener
         run: python3 listener.py
 
       - name: stage changed files

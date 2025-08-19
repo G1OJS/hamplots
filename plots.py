@@ -176,4 +176,4 @@ def do_plots(timewin_start_offset_secs):
                 plt.close()
 
 get_cfg()
-do_plots()
+do_plots(30*60)

@@ -68,8 +68,8 @@ class pskr_listener:
 
 get_cfg()
 rx = pskr_listener("Rx")
-while(True):
-    rx.loop_and_dump(15*60)
+
+rx.loop_and_dump(15*60)
 
 
 

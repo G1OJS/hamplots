@@ -150,7 +150,7 @@ def do_plots(timewin_start_offset_secs):
                 axs.set_title(f"{home_entities} SNR on {band} {mode}, to {timestr}")
                 
                 if remote_calls:
-                    rowheads, colheads, cells = hp.tabulate_reports(remote_calls, homecall_reports)
+                    rowheads, colheads, cells = tabulate_reports(remote_calls, homecall_reports)
                     print(f" ... analysing {len(rowheads)} by {len(colheads)}")
                     
                     # build DataFrame

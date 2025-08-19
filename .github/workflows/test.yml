@@ -26,4 +26,4 @@ jobs:
           python -m pip install hamplots --upgrade 
           
       - name: start_rx
-        run: hamplots start_rx --runsecs 10000
+        run: python3 listener-15m.py

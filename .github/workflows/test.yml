@@ -31,7 +31,7 @@ jobs:
       - name: stage changed files
         run: git add -f .
       - name: commit *.csv
-        run: git commit *.csv 
+        run: git commit *.csv -m "commit csv"
       - name: clean up untracked files
         run: git clean -f
       - name: pull & rebase

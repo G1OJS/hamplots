@@ -33,6 +33,8 @@ def add_decode(client, userdata, msg):
     global decodes
     d = ast.literal_eval(msg.payload.decode())
     d['sl'] = d['sl'].upper()
+    if(len(d['sl'])<4):
+        return
     d['rl'] = d['rl'].upper()
     TxRx = "Tx" if(d['sl'][0:4] in mySquares) else "Rx"
     d.update({'TxRx':TxRx})

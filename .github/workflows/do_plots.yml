@@ -6,7 +6,7 @@ on:
   workflow_dispatch:    
   workflow_call:
   workflow_run:
-      workflows: ['run-listener-tx']
+      workflows: ['run-listener']
       types: [completed]
    
 jobs:

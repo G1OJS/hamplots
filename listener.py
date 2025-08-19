@@ -51,7 +51,7 @@ mqtt_cl.on_connect = subscribe
 mqtt_cl.on_message = add_decode
 mqtt_cl.connect("mqtt.pskreporter.info", 1883, 60)
 
-time_seconds = 30
+time_seconds = 60*5
 mqtt_cl.loop_start()
 time.sleep(time_seconds)
 mqtt_cl.loop_stop()

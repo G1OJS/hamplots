@@ -28,7 +28,6 @@ class pskr_listener:
         self.mqtt_cl.on_message = self.add_decode
         self.mqtt_cl.connect("mqtt.pskreporter.info", 1883, 60)
       
-
     def loop_and_dump(self, time_seconds):
         self.mqtt_cl.loop_start()
         time.sleep(time_seconds)

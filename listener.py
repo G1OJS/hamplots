@@ -34,7 +34,7 @@ def add_decode(client, userdata, msg):
     d = ast.literal_eval(msg.payload.decode())
     d['sl'] = d['sl'].upper()
     d['rl'] = d['rl'].upper()
-    TxRx = "Tx" if(d['sl'] in mySquares) else "Rx"
+    TxRx = "Tx" if(d['sl'][0:4] in mySquares) else "Rx"
     d.update({'TxRx':TxRx})
     d.update({'hc':  d['rc'] if TxRx =="Rx" else d['sc']})
     d.update({'hl':  d['rl'] if TxRx =="Rx" else d['sl']})

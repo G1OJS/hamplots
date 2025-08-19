@@ -25,6 +25,7 @@ jobs:
           python -m pip install matplotlib --upgrade 
           python -m pip install pandas --upgrade 
 
+      - name: do plots
         run: python3 plots.py
 
       - name: stage changed files

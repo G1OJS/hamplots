@@ -85,10 +85,11 @@ def do_plots(timewin_start_offset_secs):
                         ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
                     if(len(other_calls)<75):
                         ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
+
+                    rpts_lst = [min(max(r,-20),20) for r in rpts_lst]
                     scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
-                    norm = mcolors.Normalize(vmin=-20, vmax=20)
-                    mappable = cm.ScalarMappable(norm=norm, cmap='inferno')
-                    cbar = fig.colorbar(mappable, ax=ax, label = "SNR")
+
+                    fig.colorbar(scatter, label='SNR')
                     
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
                 plt.tight_layout()         

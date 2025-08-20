@@ -29,7 +29,8 @@ def get_decodes(RxTx, band, mode, timewin_secs):
         tmax = max([d['t'] for d in decodes])
         decodes = [d for d in decodes if d['t']> (tmax - timewin_secs)]
         print(f"Read {len(decodes)} decodes from {filepath}")
-        return decodes
+        timestr = tmax.strftime("%d/%m/%Y %H:%M UTC")
+    return decodes, timestr
 
 def get_plot_data(decodes):
     best = {}
@@ -65,30 +66,24 @@ def do_plots(timewin_start_offset_secs):
     for RxTx in ["Rx","Tx"]:
         for band in myBands:
             for mode in myModes:
-                decodes = get_decodes(RxTx, band, mode, timewin_start_offset_secs)
-                if(not decodes):
-                    continue
-                hcs_lst, ocs_lst, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
-
-                timestr = datetime.datetime.now().strftime("%d/%m/%Y %H:%M UTC")
+                decodes, timestr = get_decodes(RxTx, band, mode, timewin_start_offset_secs)
                 fig, ax = plt.subplots(facecolor='grey')
                 ax.set_facecolor("#1CC4AF")
-                
                 other_action = "Transmitting" if RxTx == "Rx" else "Receiving"
                 home_entities = "Receivers'" if RxTx == "Rx" else "Transmitters'"
                 ax.set_ylabel(f"{other_action} callsign")
                 plt.suptitle(f"Activity {timewin_start_offset_secs/60:.0f} mins to {timestr}")
                 ax.set_title(f"{home_entities} SNR on {band} {mode}, to/from dxcc={mydxccs}")
                 scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
- 
-                if(len(home_calls)<400):
-                    ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
-                if(len(other_calls)<200):
-                    ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
+
+                if(decodes):
+                    hcs_lst, ocs_lst, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
+                    if(len(home_calls)<400):
+                        ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
+                    if(len(other_calls)<200):
+                        ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
-
                 fig.colorbar(scatter, label='SNR')
-
                 plt.tight_layout()         
                 if not os.path.exists("plots"):
                     os.makedirs("plots")

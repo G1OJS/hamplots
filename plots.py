@@ -68,19 +68,21 @@ def do_plots(timewin_start_offset_secs):
         for band in myBands:
             for mode in myModes:
                 decodes, timestr = get_decodes(RxTx, band, mode, timewin_start_offset_secs)
-                fig, ax = plt.subplots(facecolor='grey')
-                ax.set_facecolor("#1CC4AF")
+                fig, ax = plt.subplots()
+               ## fig, ax = plt.subplots(facecolor='grey')
+               # ax.set_facecolor("#1CC4AF")
                 other_action = "Transmitting" if RxTx == "Rx" else "Receiving"
                 home_entities = "Receivers'" if RxTx == "Rx" else "Transmitters'"
                 ax.set_ylabel(f"{other_action} callsign")
                 plt.suptitle(f"Activity {timewin_start_offset_secs/60:.0f} mins to {timestr}")
                 ax.set_title(f"{home_entities} SNR on {band} {mode}, to/from dxcc={mydxccs}")
-               
+                fig.patch.set_alpha(0.5)
+                ax.patch.set_alpha(0.5)
                 if(decodes):
                     hcs_lst, ocs_lst, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
-                    if(len(home_calls)<400):
+                    if(len(home_calls)<75):
                         ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
-                    if(len(other_calls)<200):
+                    if(len(other_calls)<75):
                         ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
                     scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
                     fig.colorbar(scatter, label='SNR')

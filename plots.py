@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import os
-import datetime
+import time
 from collections import Counter
 
 global myBands, myModes, mydxccs
@@ -18,6 +18,7 @@ def get_cfg():
 def get_decodes(RxTx, band, mode, timewin_secs):
     filepath = f"{RxTx}_decodes.csv"
     decodes = []
+    timestr = ""
     with open(filepath, "r") as f:
         for l in f.readlines():
             ls=l.strip().split(", ")
@@ -29,7 +30,7 @@ def get_decodes(RxTx, band, mode, timewin_secs):
         tmax = max([d['t'] for d in decodes])
         decodes = [d for d in decodes if d['t']> (tmax - timewin_secs)]
         print(f"Read {len(decodes)} decodes from {filepath}")
-        timestr = tmax.strftime("%d/%m/%Y %H:%M UTC")
+        timestr = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(tmax))
     return decodes, timestr
 
 def get_plot_data(decodes):
@@ -74,16 +75,16 @@ def do_plots(timewin_start_offset_secs):
                 ax.set_ylabel(f"{other_action} callsign")
                 plt.suptitle(f"Activity {timewin_start_offset_secs/60:.0f} mins to {timestr}")
                 ax.set_title(f"{home_entities} SNR on {band} {mode}, to/from dxcc={mydxccs}")
-                scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
-
+               
                 if(decodes):
                     hcs_lst, ocs_lst, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
                     if(len(home_calls)<400):
                         ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
                     if(len(other_calls)<200):
                         ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
+                    scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
+                    fig.colorbar(scatter, label='SNR')
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
-                fig.colorbar(scatter, label='SNR')
                 plt.tight_layout()         
                 if not os.path.exists("plots"):
                     os.makedirs("plots")

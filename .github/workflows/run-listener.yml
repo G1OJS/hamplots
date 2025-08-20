@@ -2,12 +2,12 @@
 name: run-listener
 
 on:
-#  schedule:
-#    - cron: '0,5,10,15,20,25,30,35,40,45,50,55 * * * *'
+  schedule:
+    - cron: '5,15,25,35,45,55 * * * *'
       
   workflow_dispatch:    
   workflow_call:
-  workflow_run:
+#  workflow_run:
     workflows: ['do_plots']
     types: [completed]
     

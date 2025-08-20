@@ -4,30 +4,31 @@ import ast
 import datetime
 import time
 
-global myBands, myModes, mySquares, decodes
+global myBands, myModes, mydxccs, decodes
 
 def get_cfg():
-    global myBands, myModes, mySquares
+    global myBands, myModes, mydxccs
     with open("hamplots.cfg","r") as f:
         lines = f.readlines()
-    mySquares = [e.strip() for e in lines[0].split(",")]
+    mydxccs = [e.strip() for e in lines[0].split(",")]
     myBands = [e.strip() for e in lines[1].split(",")]
     myModes = [e.strip() for e in lines[2].split(",")]
-    print(f"mySquares {mySquares}")
+    print(f"mydxccs {mydxccs}")
     print(f"myBands {myBands}")
     print(f"myModes {myModes}")
 
 def subscribe(client, userdata, flags, reason_code, properties):
-    global decodes
     # pskr/filter/v2/{band}/{mode}/{sendercall}/{receivercall}/{senderlocator}/{receiverlocator}/{sendercountry}/{receivercountry}
     print(f"Connected: {reason_code}")
-    for sq in mySquares:
+    for dxcc in mydxccs:
         for b in myBands:
             for md in myModes:
                 for TxRx in ["Rx","Tx"]:
-                    print(f"Subscribe to {TxRx} in {sq} on {b} {md}")
-                    tailstr = f"+/+/{sq}/+/+/#" if TxRx == "Tx" else f"+/+/+/{sq}/+/#"
-                    client.subscribe(f"pskr/filter/v2/{b}/{md}/{tailstr}")
+                    print(f"Subscribe to {TxRx} in {dxcc} on {b} {md}")
+                    tailstr = f"+/+/+/+/{dxcc}/#" if TxRx == "Tx" else f"+/+/+/+/+/{dxcc}"
+                    subs = f"pskr/filter/v2/{b}/{md}/{tailstr}"
+                    print(subs)
+                    client.subscribe(subs)
 
 def add_decode(client, userdata, msg):
     global decodes
@@ -36,7 +37,7 @@ def add_decode(client, userdata, msg):
     if(len(d['sl'])<4):
         return
     d['rl'] = d['rl'].upper()
-    TxRx = "Tx" if(d['sl'][0:4] in mySquares) else "Rx"
+    TxRx = "Tx" if(d['sa'] in mydxccs) else "Rx"
     d.update({'TxRx':TxRx})
     d.update({'hc':  d['rc'] if TxRx =="Rx" else d['sc']})
     d.update({'hl':  d['rl'] if TxRx =="Rx" else d['sl']})

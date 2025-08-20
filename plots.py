@@ -45,16 +45,17 @@ def get_plot_data(decodes):
     home_calls = sorted({hc for hc, _, _ in best_reports}, key=lambda hc: hc_cover[hc], reverse=True)
     other_calls = sorted({oc for _, oc, _ in best_reports}, key=lambda oc: oc_cover[oc])
 
-    hc_idx = {hc: i for i, hc in enumerate(home_calls)}
+    hc_idx = {hc: i for i, hc in enumerate(home_calls)}     # = {'call',i} i=0,1,2,3 ...
     oc_idx = {oc: i for i, oc in enumerate(other_calls)}
 
     sorted_reports = sorted(best_reports, key=lambda x: (hc_idx[x[0]], oc_idx[x[1]]))
 
-    hcs_lst = [hc_idx[hc] for hc, oc, snr in sorted_reports]
-    ocs_lst = [oc_idx[oc] for hc, oc, snr in sorted_reports]
+    # arrays ready for plotting
+    hc_idxs = [hc_idx[hc] for hc, oc, snr in sorted_reports] # = 0,0,0,0,1,1,1,1,1,2,2,2 ...
+    oc_idxs = [oc_idx[oc] for hc, oc, snr in sorted_reports]
     snrs = [snr for hc, oc, snr in sorted_reports]
 
-    return hcs_lst, ocs_lst, snrs, home_calls, other_calls
+    return hc_idxs, oc_idxs, snrs, home_calls, other_calls
 
 
 
@@ -78,8 +79,14 @@ def do_plots(timewin_start_offset_secs):
                 ax.set_ylabel(f"{other_action} callsign")
                 plt.suptitle(f"Activity {timewin_start_offset_secs/60:.0f} mins to {timestr}")
                 ax.set_title(f"{home_entities} SNR on {band} {mode}, to/from dxcc={mydxccs}")
-
                 scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
+ 
+                if(len(home_calls)<400):
+                    ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
+                if(len(other_calls)<200):
+                    ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
+                ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+
                 fig.colorbar(scatter, label='SNR')
 
                 plt.tight_layout()         

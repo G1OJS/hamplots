@@ -10,7 +10,7 @@ def get_cfg():
     global myBands, myModes, mydxccs
     with open("hamplots.cfg","r") as f:
         lines = f.readlines()
-    mydxccs = [e.strip() for e in lines[0].split(",")]
+    mydxccs = [int(e.strip()) for e in lines[0].split(",")]
     myBands = [e.strip() for e in lines[1].split(",")]
     myModes = [e.strip() for e in lines[2].split(",")]
     print(f"mydxccs {mydxccs}")

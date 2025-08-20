@@ -3,13 +3,13 @@ name: run-listener
 
 on:
   schedule:
-    - cron: '5,15,25,35,45,55 * * * *'
+    - cron: '5,15,25,37,47,57 * * * *'
       
   workflow_dispatch:    
   workflow_call:
 #  workflow_run:
-    workflows: ['do_plots']
-    types: [completed]
+#    workflows: ['do_plots']
+#    types: [completed]
     
 jobs:
   collect:

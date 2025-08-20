@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import matplotlib.colors as mcolors
 import os
 import time
 from collections import Counter
@@ -85,7 +86,10 @@ def do_plots(timewin_start_offset_secs):
                     if(len(other_calls)<75):
                         ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
                     scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
-                    fig.colorbar(scatter, label='SNR')
+                    norm = mcolors.Normalize(vmin=-20, vmax=20)
+                    mappable = cm.ScalarMappable(norm=norm, cmap='inferno')
+                    cbar = fig.colorbar(mappable, ax=ax, label = "SNR")
+                    
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
                 plt.tight_layout()         
                 if not os.path.exists("plots"):

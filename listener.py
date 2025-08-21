@@ -67,6 +67,6 @@ def run(decodes_file = "decodes_local.csv", time_seconds = 0):
 if os.path.exists("local_token"):
     run()
 else:
-    run(decodes_file = "decodes.csv", time_seconds = 5*60)
+    run(decodes_file = "decodes.csv", time_seconds = 20*60)
 
 

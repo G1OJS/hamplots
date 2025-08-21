@@ -4,6 +4,7 @@ import matplotlib.colors as mcolors
 import os
 import time
 from collections import Counter
+from collections import defaultdict
 import subprocess
 
 global myBands, myModes, mydxccs
@@ -41,17 +42,32 @@ def get_plot_data(decodes):
         hc, oc, snr = d["hc"], d["oc"], int(d["rp"])
         key = (hc, oc)
         best[key] = max(snr, best.get(key, -80))
+    # best snr for each hc-oc pair over time window
     best_reports = [(hc, oc, snr) for (hc, oc), snr in best.items()]
 
+    # home calls' coverage of other calls
     hc_cover = Counter(hc for hc, oc, snr in best_reports)
+    # other calls' coverage of home calls
     oc_cover = Counter(oc for hc, oc, snr in best_reports)
 
+
+    # rarity-weighted score for each home call
+#    hc_score = defaultdict(float)
+#    for hc, oc, snr in best_reports:
+#        hc_score[hc] += 1 / oc_cover[oc]    # or 100/oc_cover[oc] if you want larger numbers
+    # sort home calls by rarity-weighted score
+#    home_calls = sorted(hc_score, key=lambda hc: hc_score[hc], reverse=True)
+
+    # sort home calls by number of other calls covered
     home_calls = sorted({hc for hc, _, _ in best_reports}, key=lambda hc: hc_cover[hc], reverse=True)
+
+
+    # sort other calls by number of home calls covered
     other_calls = sorted({oc for _, oc, _ in best_reports}, key=lambda oc: oc_cover[oc])
 
+    # regenerate [(hc, oc, snr)] respecting the ordering of hc and oc calculated above
     hc_idx = {hc: i for i, hc in enumerate(home_calls)}     # = {'call',i} i=0,1,2,3 ...
     oc_idx = {oc: i for i, oc in enumerate(other_calls)}
-
     sorted_reports = sorted(best_reports, key=lambda x: (hc_idx[x[0]], oc_idx[x[1]]))
 
     # arrays ready for plotting
@@ -78,10 +94,8 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
                 fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [5, 1]})
                 ax, axtext = axs[0], axs[1]
                 axtext.set_axis_off()
-                other_action = "Transmitting" if RxTx == "Rx" else "Receiving"
-                home_entities = "Receivers'" if RxTx == "Rx" else "Transmitters'"
-                ax.set_ylabel(f"{other_action} callsign")
-                plt.suptitle(f"{home_entities} SNR on {band} {mode}, to/from dxcc={",".join(mydxccs)}")
+                ax.set_ylabel(f"{'Transmitting' if RxTx == 'Rx' else 'Receiving'} callsign")
+                plt.suptitle(f"SNR for {'receivers' if RxTx == 'Rx' else 'Transmitters'} in dxcc={','.join(mydxccs)} on {band} {mode}")
                 
                 fig.patch.set_alpha(0.4)
                 ax.patch.set_alpha(0.4)
@@ -95,11 +109,13 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
                     scatter = ax.scatter(hcs_idxs, ocs_idxs, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
                     fig.colorbar(scatter, label='SNR')
                     
-                    axtext.text(0,1,f"Chart shows activity for {timewin_start_offset_secs/60:.0f} mins to {timestr}", horizontalalignment='left', fontsize=10)
-                    txt="Number of active callsigns:"+f"{len(home_calls)}"
-                    txt+=f"\nTop 10 callsigns by number of spotting/spotted callsigns:"
-                    txt+=f"\n{", ".join(home_calls[0:10])}"
-                    axtext.text(0.02,0.3,txt, horizontalalignment = 'left', fontsize=8)
+                    axtext.text(0,1.4,f"Chart shows activity for {timewin_start_offset_secs/60:.0f} mins to {timestr} UTC", horizontalalignment='left', fontsize=10)
+                    txt =  f"Home callsigns sorted left-right by number of other callsigns {'reached' if RxTx=='Tx' else 'heard'}"
+                    txt += f"\nCallsigns sorted top-bottom by number of home callsigns {'reached' if RxTx=='Rx' else 'heard'}"
+                    txt += f"\nNumber of active home callsigns: {len(home_calls)}"
+                    txt += f"\nTop 10 home callsigns by number of callsigns {'reached' if RxTx=='Tx' else 'heard'}:"
+                    txt += f"\n{", ".join(home_calls[0:10])}"
+                    axtext.text(0.02,0.3,txt, horizontalalignment = 'left', fontsize=7)
                     
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
                 plt.tight_layout()         

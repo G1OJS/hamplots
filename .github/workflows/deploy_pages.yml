@@ -4,9 +4,9 @@ name: Deploy to pages
 on:
 #  schedule:
 #      - cron: '*/5 * * * *'
-#  push:
-#    paths:
-#      - '**.png'     
+  push:
+    paths:
+      - '**.png'     
   workflow_dispatch:
   workflow_call:
   workflow_run:

@@ -37,19 +37,23 @@ def add_decode(client, userdata, msg):
     if(len(d['sl'])<4):
         return
     d['rl'] = d['rl'].upper()
-    TxRx=False
-    if(d['sa'] in mydxccs):
-        TxRx = "Tx"
     if(d['ra'] in mydxccs):
-        TxRx = "Rx"
-    if(TxRx):
-        d.update({'TxRx':TxRx})
-        d.update({'hc':  d['rc'] if TxRx =="Rx" else d['sc']})
-        d.update({'hl':  d['rl'] if TxRx =="Rx" else d['sl']})
-        d.update({'ha':  d['ra'] if TxRx =="Rx" else d['sa']})
-        d.update({'oc':  d['sc'] if TxRx =="Rx" else d['rc']})
-        d.update({'ol':  d['sl'] if TxRx =="Rx" else d['rl']})
-        d.update({'oa':  d['sa'] if TxRx =="Rx" else d['ra']})
+        d.update({'TxRx':'Rx'}))
+        d.update({'hc': d['rc']) 
+        d.update({'hl': d['rl'])
+        d.update({'ha': d['ra'])
+        d.update({'oc': d['sc'])
+        d.update({'ol': d['sl'])
+        d.update({'oa': d['sa'])
+        decodes.append(d)
+    if(d['sa'] in mydxccs):      
+        d.update({'TxRx':'Tx'})
+        d.update({'hc': d['sc']})
+        d.update({'hl': d['sl']})
+        d.update({'ha': d['sa']})
+        d.update({'oc': d['rc']})
+        d.update({'ol': d['rl']})
+        d.update({'oa': d['ra']})
         decodes.append(d)
 
 decodes = []
@@ -73,6 +77,7 @@ for d in decodes:
     f = ftx if d['TxRx'] == "Tx" else frx
     f.write(ebfm+spot)
 f.flush()
+
 
 
 

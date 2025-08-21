@@ -4,6 +4,7 @@ import matplotlib.colors as mcolors
 import os
 import time
 from collections import Counter
+import subprocess
 
 global myBands, myModes, mydxccs
 
@@ -60,7 +61,12 @@ def get_plot_data(decodes):
 
     return hc_idxs, oc_idxs, snrs, home_calls, other_calls
 
-
+def git_upload():
+    repo_dir = r"C:\Users\drala\Documents\Projects\GitHub\hamplots"
+    subprocess.run(["git", "add", "-f", "./plots/*.png"], cwd=repo_dir)
+    subprocess.run(["git", "commit", "-m", "upload local data"], cwd=repo_dir)
+    subprocess.run(["git", "pull", "--rebase"], cwd=repo_dir)
+    subprocess.run(["git", "push", "-f"], cwd=repo_dir)
 
 def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*60):
     get_cfg()
@@ -95,12 +101,14 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
                 plt.tight_layout()         
                 if not os.path.exists("plots"):
                     os.makedirs("plots")
+                print(f"Saving plot plots/{RxTx}_{band}_{mode}.png")
                 plt.savefig(f"plots/{RxTx}_{band}_{mode}.png")
                 plt.close()
 
 if os.path.exists("local_token"):
     print("Running local")
     do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*60)
+    git_upload()
 else:
     print("Running remote")
     do_plots(decodes_file = "decodes.csv", timewin_start_offset_secs = 30*60)

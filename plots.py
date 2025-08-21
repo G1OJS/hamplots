@@ -16,16 +16,16 @@ def get_cfg():
     myModes = [e.strip() for e in lines[2].split(",")]
     
 
-def get_decodes(RxTx, band, mode, timewin_secs):
-    filepath = f"{RxTx}_decodes.csv"
+def get_decodes(RxTx, band, mode, decodes_file, timewin_secs):
+    filepath = f"{RxTx}_{decodes_file}"
     decodes = []
     timestr = ""
     with open(filepath, "r") as f:
         for l in f.readlines():
             ls=l.strip().split(", ")
             b,m,rt = ls[1], ls[3], ls[7]
-            if( b==band and m==mode and rt==RxTx):                
-                d = {'t':int(ls[0]), 'b':b, 'md':m, 'hc':ls[4].replace('-','.'), 'TxRx':rt, 'oc':ls[8].replace('-','.'),'rp':ls[11]}
+            if( b==band and m==mode):
+                d = {'t':int(ls[0]), 'b':b, 'md':m, 'hc':ls[4].replace('-','.'), 'oc':ls[8].replace('-','.'),'rp':ls[11]}
                 decodes.append(d)
     if(decodes):
         tmax = max([d['t'] for d in decodes])
@@ -62,13 +62,13 @@ def get_plot_data(decodes):
 
 
 
-def do_plots(timewin_start_offset_secs):
+def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*60):
+    get_cfg()
     print(f"Starting plots with time window {timewin_start_offset_secs} secs")
-
     for RxTx in ["Rx","Tx"]:
         for band in myBands:
             for mode in myModes:
-                decodes, timestr = get_decodes(RxTx, band, mode, timewin_start_offset_secs)
+                decodes, timestr = get_decodes(RxTx, band, mode, decodes_file, timewin_start_offset_secs)
                 fig, ax = plt.subplots()
                ## fig, ax = plt.subplots(facecolor='grey')
                # ax.set_facecolor("#1CC4AF")
@@ -98,6 +98,8 @@ def do_plots(timewin_start_offset_secs):
                 plt.savefig(f"plots/{RxTx}_{band}_{mode}.png")
                 plt.close()
 
-get_cfg()
+if os.path.exists("local_token"):
+    do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*60)
+else:
+    do_plots(decodes_file = "decodes.csv", timewin_start_offset_secs = 30*60)
 
-do_plots(30*60)

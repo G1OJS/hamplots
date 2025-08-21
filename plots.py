@@ -54,7 +54,7 @@ def get_plot_data(decodes):
     # rarity-weighted score for each home call
 #    hc_score = defaultdict(float)
 #    for hc, oc, snr in best_reports:
-#        hc_score[hc] += 1 / oc_cover[oc]    # or 100/oc_cover[oc] if you want larger numbers
+#        hc_score[hc] += 1 / oc_cover[oc]
     # sort home calls by rarity-weighted score
 #    home_calls = sorted(hc_score, key=lambda hc: hc_score[hc], reverse=True)
 

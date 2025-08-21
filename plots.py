@@ -99,7 +99,9 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
                 plt.close()
 
 if os.path.exists("local_token"):
+    print("Running local")
     do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*60)
 else:
+    print("Running remote")
     do_plots(decodes_file = "decodes.csv", timewin_start_offset_secs = 30*60)
 

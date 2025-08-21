@@ -75,27 +75,31 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
         for band in myBands:
             for mode in myModes:
                 decodes, timestr = get_decodes(RxTx, band, mode, decodes_file, timewin_start_offset_secs)
-                fig, ax = plt.subplots()
-               ## fig, ax = plt.subplots(facecolor='grey')
-               # ax.set_facecolor("#1CC4AF")
+                fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [5, 1]})
+                ax, axtext = axs[0], axs[1]
+                axtext.set_axis_off()
                 other_action = "Transmitting" if RxTx == "Rx" else "Receiving"
                 home_entities = "Receivers'" if RxTx == "Rx" else "Transmitters'"
                 ax.set_ylabel(f"{other_action} callsign")
-                plt.suptitle(f"Activity {timewin_start_offset_secs/60:.0f} mins to {timestr}")
-                ax.set_title(f"{home_entities} SNR on {band} {mode}, to/from dxcc={mydxccs}")
-                fig.patch.set_alpha(0.5)
-                ax.patch.set_alpha(0.5)
+                plt.suptitle(f"{home_entities} SNR on {band} {mode}, to/from dxcc={",".join(mydxccs)}")
+                
+                fig.patch.set_alpha(0.4)
+                ax.patch.set_alpha(0.4)
                 if(decodes):
-                    hcs_lst, ocs_lst, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
+                    hcs_idxs, ocs_idxs, rpts_lst, home_calls, other_calls = get_plot_data(decodes)
                     if(len(home_calls)<75):
                         ax.set_xticks(range(len(home_calls)), home_calls, rotation='vertical', size = 6)
                     if(len(other_calls)<75):
                         ax.set_yticks(range(len(other_calls)), other_calls, size = 6)
-
                     rpts_lst = [min(max(r,-20),20) for r in rpts_lst]
-                    scatter = ax.scatter(hcs_lst, ocs_lst, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
-
+                    scatter = ax.scatter(hcs_idxs, ocs_idxs, c=rpts_lst, cmap='inferno', s=25, alpha = 0.6)
                     fig.colorbar(scatter, label='SNR')
+                    
+                    axtext.text(0,1,f"Chart shows activity for {timewin_start_offset_secs/60:.0f} mins to {timestr}", horizontalalignment='left', fontsize=10)
+                    txt="Number of active callsigns:"+f"{len(home_calls)}"
+                    txt+=f"\nTop 10 callsigns by number of spotting/spotted callsigns:"
+                    txt+=f"\n{", ".join(home_calls[0:10])}"
+                    axtext.text(0.02,0.3,txt, horizontalalignment = 'left', fontsize=8)
                     
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
                 plt.tight_layout()         

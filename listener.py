@@ -38,13 +38,13 @@ def add_decode(client, userdata, msg):
         return
     d['rl'] = d['rl'].upper()
     if(d['ra'] in mydxccs):
-        d.update({'TxRx':'Rx'}))
-        d.update({'hc': d['rc']) 
-        d.update({'hl': d['rl'])
-        d.update({'ha': d['ra'])
-        d.update({'oc': d['sc'])
-        d.update({'ol': d['sl'])
-        d.update({'oa': d['sa'])
+        d.update({'TxRx':'Rx'})
+        d.update({'hc': d['rc']}) 
+        d.update({'hl': d['rl']})
+        d.update({'ha': d['ra']})
+        d.update({'oc': d['sc']})
+        d.update({'ol': d['sl']})
+        d.update({'oa': d['sa']})
         decodes.append(d)
     if(d['sa'] in mydxccs):      
         d.update({'TxRx':'Tx'})

@@ -47,11 +47,11 @@ def add_decode(client, userdata, msg):
         ftx.write(ebfm+spot)
         ftx.flush()
 
-def run(time_seconds = 0):
+def run(decodes_file = "decodes_local.csv", time_seconds = 0):
     global ftx, frx
     get_cfg()
-    frx = open("Rx_decodes.csv","a")
-    ftx = open("Tx_decodes.csv","a")
+    frx = open(f"Rx_{decodes_file}","a")
+    ftx = open(f"Tx_{decodes_file}","a")
     mqtt_cl = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     mqtt_cl.on_connect = subscribe
     mqtt_cl.on_message = add_decode
@@ -67,6 +67,6 @@ def run(time_seconds = 0):
 if os.path.exists("local_token"):
     run()
 else:
-    run(5*60)
+    run(decodes_file = "decodes.csv", time_seconds = 5*60)
 
 

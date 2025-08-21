@@ -1,10 +1,10 @@
-
 import paho.mqtt.client as mqtt
 import ast
 import datetime
 import time
+import os
 
-global myBands, myModes, mydxccs, decodes
+global myBands, myModes, mydxccs, ftx, frx
 
 def get_cfg():
     global myBands, myModes, mydxccs
@@ -31,54 +31,42 @@ def subscribe(client, userdata, flags, reason_code, properties):
                     client.subscribe(subs)
 
 def add_decode(client, userdata, msg):
-    global decodes
+    global ftx, frx
     d = ast.literal_eval(msg.payload.decode())
     d['sl'] = d['sl'].upper()
     if(len(d['sl'])<4):
         return
     d['rl'] = d['rl'].upper()
-    if(d['ra'] in mydxccs):
-        d.update({'TxRx':'Rx'})
-        d.update({'hc': d['rc']}) 
-        d.update({'hl': d['rl']})
-        d.update({'ha': d['ra']})
-        d.update({'oc': d['sc']})
-        d.update({'ol': d['sl']})
-        d.update({'oa': d['sa']})
-        decodes.append(d)
-    if(d['sa'] in mydxccs):      
-        d.update({'TxRx':'Tx'})
-        d.update({'hc': d['sc']})
-        d.update({'hl': d['sl']})
-        d.update({'ha': d['sa']})
-        d.update({'oc': d['rc']})
-        d.update({'ol': d['rl']})
-        d.update({'oa': d['ra']})
-        decodes.append(d)
-
-decodes = []
-get_cfg()
-mqtt_cl = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-mqtt_cl.on_connect = subscribe
-mqtt_cl.on_message = add_decode
-mqtt_cl.connect("mqtt.pskreporter.info", 1883, 60)
-
-time_seconds = 60*5
-mqtt_cl.loop_start()
-time.sleep(time_seconds)
-mqtt_cl.loop_stop()
-mqtt_cl.disconnect()
-
-frx = open("Rx_decodes.csv","a")
-ftx = open("Tx_decodes.csv","a")
-for d in decodes:
     ebfm = f"{d['t']}, {d['b']}, {d['f']}, {d['md']}, "
-    spot = f"{d['hc']}, {d['hl']}, {d['ha']}, {d['TxRx']}, {d['oc']}, {d['ol']}, {d['oa']}, {d['rp']}\n"
-    f = ftx if d['TxRx'] == "Tx" else frx
-    f.write(ebfm+spot)
-f.flush()
+    if(d['ra'] in mydxccs):
+        spot = f"{d['rc']}, {d['rl']}, {d['ra']}, 'Rx', {d['sc']}, {d['sl']}, {d['sa']}, {d['rp']}\n"
+        frx.write(ebfm+spot)
+        frx.flush()
+    if(d['sa'] in mydxccs):
+        spot = f"{d['sc']}, {d['sl']}, {d['sa']}, 'Tx', {d['rc']}, {d['rl']}, {d['ra']}, {d['rp']}\n"
+        ftx.write(ebfm+spot)
+        ftx.flush()
 
+def run(time_seconds = 0):
+    global ftx, frx
+    get_cfg()
+    frx = open("Rx_decodes.csv","a")
+    ftx = open("Tx_decodes.csv","a")
+    mqtt_cl = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    mqtt_cl.on_connect = subscribe
+    mqtt_cl.on_message = add_decode
+    mqtt_cl.connect("mqtt.pskreporter.info", 1883, 60)
+    if(time_seconds == 0):
+        mqtt_cl.loop_forever()
+    else:
+        mqtt_cl.loop_start()
+        time.sleep(time_seconds)
+        mqtt_cl.loop_stop()
+        mqtt_cl.disconnect()
 
-
+if os.path.exists("local_token"):
+    run()
+else:
+    run(5*60)
 
 

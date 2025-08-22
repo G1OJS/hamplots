@@ -114,7 +114,7 @@ def do_plots(decodes_file = "decodes_local.csv", timewin_start_offset_secs = 30*
                     txt += f"\nCallsigns sorted top-bottom by number of home callsigns {'reached' if RxTx=='Rx' else 'heard'}"
                     txt += f"\nNumber of active home callsigns: {len(home_calls)}"
                     txt += f"\nTop 10 home callsigns by number of callsigns {'reached' if RxTx=='Tx' else 'heard'}:"
-                    txt += f"\n{", ".join(home_calls[0:10])}"
+                    txt += f"\n{', '.join(home_calls[0:10])}"
                     axtext.text(0.02,0.3,txt, horizontalalignment = 'left', fontsize=7)
                     
                 ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
